@@ -10,6 +10,11 @@
 
 * { box-sizing: border-box; }
 
+/* Force [hidden] to fully remove from layout, since .centered and #chat
+   declare their own display: grid which would otherwise override the
+   user-agent stylesheet's default `[hidden] { display: none }`. */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;

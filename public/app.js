@@ -175,17 +175,25 @@ els.end.addEventListener("click", async () => {
   await endSession();
 });
 async function endSession() {
-  if (!STATE.sessionId || STATE.turns.length === 0) return;
-  const payload = JSON.stringify({ sessionId: STATE.sessionId, turns: STATE.turns });
-  // Prefer sendBeacon for tab-close reliability; fall back to fetch.
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon("/end-session", new Blob([payload], { type: "application/json" }));
-  } else {
-    fetch("/end-session", { method: "POST", headers: { "content-type": "application/json" }, body: payload, keepalive: true });
+  // Save transcript only if there's something worth saving.
+  if (STATE.sessionId && STATE.turns.length > 0) {
+    const payload = JSON.stringify({ sessionId: STATE.sessionId, turns: STATE.turns });
+    // Prefer sendBeacon for tab-close reliability; fall back to fetch.
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/end-session", new Blob([payload], { type: "application/json" }));
+    } else {
+      fetch("/end-session", { method: "POST", headers: { "content-type": "application/json" }, body: payload, keepalive: true });
+    }
   }
+  // Reset everything and return to the name prompt so the next person
+  // walking up to the shop computer identifies themselves fresh.
   STATE.sessionId = null;
   STATE.turns = [];
-  await startSession(STATE.name);
+  STATE.name = null;
+  localStorage.removeItem(`shop-os-chat:name:${STATE.vaultHash}`);
+  els.messages.innerHTML = "";
+  els.nameInput.value = "";
+  showNamePrompt();
 }
 window.addEventListener("beforeunload", () => {
   if (STATE.sessionId && STATE.turns.length > 0) {
