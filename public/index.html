@@ -1,3 +1,37 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Shop OS Chat</title></head>
-<body><p>Shop OS Chat</p></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop OS Chat</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <!-- Name prompt (shown first visit only) -->
+  <section id="name-card" class="centered" hidden>
+    <div class="card">
+      <h1>Shop OS Chat</h1>
+      <p>Who's chatting?</p>
+      <input id="name-input" type="text" autocomplete="given-name" placeholder="Your name" />
+      <button id="name-submit">Continue</button>
+    </div>
+  </section>
+
+  <!-- Chat -->
+  <section id="chat" hidden>
+    <header>
+      <span class="brand">Shop OS Chat</span>
+      <span class="who">— <span id="who"></span></span>
+      <button id="end" type="button" title="Save transcript and start over">End conversation</button>
+    </header>
+    <main id="messages"></main>
+    <form id="composer">
+      <input id="prompt" type="text" placeholder="Ask about your shop..." autocomplete="off" />
+      <button id="send" type="submit">Send</button>
+    </form>
+  </section>
+
+  <script src="/assets/marked.min.js"></script>
+  <script src="/assets/app.js" type="module"></script>
+</body>
+</html>
