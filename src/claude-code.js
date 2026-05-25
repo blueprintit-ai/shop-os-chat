@@ -1,6 +1,8 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
 
-export const READ_ONLY_TOOLS = ["Read", "Glob", "Grep"];
+// Frozen so a runtime mutation of this array cannot quietly expand the whitelist.
+// This whitelist is the entire feature's read-only safety boundary.
+export const READ_ONLY_TOOLS = Object.freeze(["Read", "Glob", "Grep"]);
 
 export function buildQueryOptions({ vaultPath, systemPrompt, claudeSessionId }) {
   const opts = {
