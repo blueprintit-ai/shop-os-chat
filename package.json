@@ -1,0 +1,38 @@
+{
+  "name": "@blueprintit/shop-os-chat",
+  "version": "0.1.0",
+  "description": "Read-only branded chat surface for Shop OS Foundation vaults.",
+  "type": "module",
+  "bin": {
+    "shop-os-chat": "./bin/shop-os-chat.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "public",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "keywords": [
+    "shop-os",
+    "blueprint-it",
+    "claude-code",
+    "chat"
+  ],
+  "author": "Blueprint IT <info@blueprintit.ai>",
+  "license": "UNLICENSED",
+  "homepage": "https://blueprintit.ai/shop-os",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blueprintit-ai/shop-os-chat.git"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.150",
+    "marked": "18.0.4"
+  }
+}
