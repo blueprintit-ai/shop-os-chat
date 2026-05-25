@@ -59,3 +59,27 @@ test("buildQueryOptions sets permissionMode to default (tool restriction enforce
   });
   assert.equal(opts.permissionMode, "default");
 });
+
+test("buildQueryOptions restricts available tools via `tools` (not just auto-approval)", () => {
+  // The SDK distinguishes between `tools` (which tools EXIST in the session)
+  // and `allowedTools` (which run without prompting). Without `tools`, the
+  // model sees Bash/Edit/Write/etc. from the host's Claude Code config.
+  const opts = buildQueryOptions({
+    vaultPath: "/v",
+    systemPrompt: "x",
+    claudeSessionId: null,
+  });
+  assert.deepEqual([...opts.tools].sort(), ["Glob", "Grep", "Read"]);
+});
+
+test("buildQueryOptions disables filesystem settingSources for SDK isolation", () => {
+  // Without settingSources:[] the SDK loads ~/.claude/settings.json and any
+  // project .claude/settings.json from the cwd, dragging in the host
+  // developer's allowlists, hooks, MCP servers, and skill plugins.
+  const opts = buildQueryOptions({
+    vaultPath: "/v",
+    systemPrompt: "x",
+    claudeSessionId: null,
+  });
+  assert.deepEqual(opts.settingSources, []);
+});

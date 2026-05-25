@@ -8,7 +8,17 @@ export function buildQueryOptions({ vaultPath, systemPrompt, claudeSessionId }) 
   const opts = {
     cwd: vaultPath,
     systemPrompt,
+    // `tools` restricts the base set of built-in tools available to the model.
+    // `allowedTools` is for auto-approval — it does NOT restrict availability.
+    // We pass both so the whitelist is enforced AND those tools run without
+    // prompting (the SDK has no user to prompt in our context).
+    tools: [...READ_ONLY_TOOLS],
     allowedTools: [...READ_ONLY_TOOLS],
+    // Isolate from the host machine's Claude Code config (user/project/local
+    // settings.json, CLAUDE.md, hooks, MCP servers, project skill lists).
+    // Without this, the developer's personal allowlist, hooks, and plugin
+    // tools bleed into the customer's chat session.
+    settingSources: [],
     permissionMode: "default",
     maxTurns: 20,
   };
