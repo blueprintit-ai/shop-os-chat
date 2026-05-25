@@ -1,6 +1,6 @@
 import { createServer as createHttpServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
-import { join, dirname, extname } from "node:path";
+import { join, dirname, extname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SessionStore } from "./sessions.js";
 import { writeTranscript } from "./transcript.js";
@@ -50,6 +50,12 @@ function sendJson(res, status, obj) {
   send(res, status, { "content-type": "application/json; charset=utf-8" }, JSON.stringify(obj));
 }
 
+function escapeAttr(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
 function serveStatic(req, res, path) {
   if (!existsSync(path)) {
     return send(res, 404, { "content-type": "text/plain" }, "Not found");
@@ -70,7 +76,16 @@ export function createServer({ vaultPath, runTurn = defaultRunTurn }) {
       const url = new URL(req.url, "http://localhost");
 
       if (req.method === "GET" && url.pathname === "/") {
-        return serveStatic(req, res, join(PUBLIC_DIR, "index.html"));
+        const indexPath = join(PUBLIC_DIR, "index.html");
+        if (!existsSync(indexPath)) {
+          return send(res, 404, { "content-type": "text/plain" }, "Not found");
+        }
+        // Inject the real vault name so obsidian:// wikilinks in the frontend
+        // resolve to the customer's actual vault, not a hard-coded fallback.
+        const html = readFileSync(indexPath, "utf8")
+          .replace(/__VAULT_NAME__/g, escapeAttr(basename(vaultPath)));
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        return res.end(html);
       }
       if (req.method === "GET" && url.pathname.startsWith("/assets/")) {
         const rel = url.pathname.slice("/assets/".length);
