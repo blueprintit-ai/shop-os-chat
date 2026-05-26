@@ -12,7 +12,7 @@ shop-os-chat "/path/to/Shop OS Vault"
 Launches a local web server on the first free port in 7777-7790 and opens
 the default browser. The customer's vault folder is the working directory
 for all Claude Code calls. No `ANTHROPIC_API_KEY` is involved; auth uses
-the customer's Claude Max subscription via Claude Code.
+the customer's Claude subscription via Claude Code.
 
 ## License
 
