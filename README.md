@@ -1,12 +1,12 @@
 # @blueprintit/shop-os-chat
 
-Read-only branded chat surface for Shop OS Foundation vaults. Bundled with
-the [Shop OS installer](https://github.com/blueprintit-ai/shop-os-installer).
+Read-only branded chat surface for Blueprint OS Foundation vaults. Bundled with
+the [Blueprint OS installer](https://github.com/blueprintit-ai/shop-os-installer).
 
 ## Usage
 
 ```sh
-shop-os-chat "/path/to/Shop OS Vault"
+shop-os-chat "/path/to/Blueprint OS Vault"
 ```
 
 Launches a local web server on the first free port in 7777-7790 and opens
@@ -16,4 +16,4 @@ the customer's Claude subscription via Claude Code.
 
 ## License
 
-UNLICENSED. Part of Blueprint IT's Shop OS Foundation product.
+UNLICENSED. Part of Blueprint IT's Blueprint OS Foundation product.

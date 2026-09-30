@@ -1,7 +1,7 @@
 {
   "name": "@blueprintit/shop-os-chat",
   "version": "0.1.0",
-  "description": "Read-only branded chat surface for Shop OS Foundation vaults.",
+  "description": "Read-only branded chat surface for Blueprint OS Foundation vaults.",
   "type": "module",
   "bin": {
     "shop-os-chat": "./bin/shop-os-chat.js"

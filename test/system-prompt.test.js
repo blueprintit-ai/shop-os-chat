@@ -47,7 +47,7 @@ test("buildSystemPrompt extracts owner name from Context/operator.md", () => {
 test("buildSystemPrompt uses sensible defaults when Context files are missing", () => {
   withTempVault(() => {}, (vault) => {
     const p = buildSystemPrompt({ vaultPath: vault, name: "Marco" });
-    assert.match(p, /Shop OS Chat/);
+    assert.match(p, /Blueprint OS Chat/);
     assert.match(p, /the shop owner/i);
   });
 });

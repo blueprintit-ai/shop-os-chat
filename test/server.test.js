@@ -23,7 +23,7 @@ test("GET / returns the index.html shell", async () => {
     assert.equal(res.status, 200);
     assert.match(res.headers.get("content-type"), /html/);
     const body = await res.text();
-    assert.match(body, /Shop OS Chat/);
+    assert.match(body, /Blueprint OS Chat/);
   } finally {
     server.close();
     rmSync(vault, { recursive: true, force: true });

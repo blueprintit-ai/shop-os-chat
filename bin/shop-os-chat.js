@@ -41,7 +41,7 @@ function parseArgs(argv) {
 
 function help() {
   console.log(`
-Shop OS Chat — local read-only chat surface for Shop OS Foundation vaults.
+Blueprint OS Chat — local read-only chat surface for Blueprint OS Foundation vaults.
 
 Usage:  shop-os-chat <vault-path> [options]
 
@@ -59,7 +59,7 @@ async function main() {
   if (!args.vault) die("Missing vault path. Run: shop-os-chat <vault-path>");
   const vaultPath = resolve(args.vault);
   if (!existsSync(vaultPath) || !statSync(vaultPath).isDirectory()) {
-    die(`Vault folder not found: ${vaultPath}\nMove "Shop OS Chat.command" back into your vault folder.`);
+    die(`Vault folder not found: ${vaultPath}\nMove "Blueprint OS Chat.command" back into your vault folder.`);
   }
 
   // License gate
@@ -67,12 +67,12 @@ async function main() {
   const lr = validateLicense(license);
   if (!lr.ok) die(lr.error);
 
-  console.log(c.bold(c.cyan("Shop OS Chat")));
+  console.log(c.bold(c.cyan("Blueprint OS Chat")));
   console.log(c.dim(`  vault: ${vaultPath}`));
   console.log(c.dim(`  customer: ${license.customer ?? "unknown"}`));
 
   const port = args.port ?? await findFreePort().catch(() => null);
-  if (!port) die("No free port available in 7777-7790. Close another Shop OS Chat instance and try again.");
+  if (!port) die("No free port available in 7777-7790. Close another Blueprint OS Chat instance and try again.");
 
   const server = createServer({ vaultPath });
   server.listen(port, "127.0.0.1", () => {

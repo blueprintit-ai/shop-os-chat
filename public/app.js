@@ -1,4 +1,4 @@
-// Shop OS Chat — frontend
+// Blueprint OS Chat — frontend
 const $ = (sel) => document.querySelector(sel);
 
 const els = {
@@ -87,7 +87,7 @@ els.composer.addEventListener("submit", async (e) => {
 });
 
 async function streamChat(prompt) {
-  const assistantNode = appendMessage("assistant", "Shop OS", "");
+  const assistantNode = appendMessage("assistant", "Blueprint OS", "");
   const bodyNode = assistantNode.querySelector(".body");
   let text = "";
 
@@ -156,7 +156,7 @@ function renderMarkdown(md) {
 function guessVaultName() {
   // The server only knows the vault path. Best effort: last path segment.
   // The customer always sees the same vault name since this app runs per-vault.
-  return window.SHOP_OS_VAULT_NAME || "Shop OS Vault";
+  return window.SHOP_OS_VAULT_NAME || "Blueprint OS Vault";
 }
 
 function escapeHtml(s) {

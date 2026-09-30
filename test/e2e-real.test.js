@@ -21,7 +21,7 @@ test("real Claude Code SDK turn yields text and respects read-only", { skip: SKI
   for await (const event of runTurn({
     prompt: "What is the name of the shop in this vault?",
     vaultPath: vault,
-    systemPrompt: "You are Shop OS Chat. Read-only. Answer concretely.",
+    systemPrompt: "You are Blueprint OS Chat. Read-only. Answer concretely.",
     claudeSessionId: null,
   })) {
     if (event.type === "text") gotText = true;
