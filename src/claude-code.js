@@ -1,8 +1,46 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
+import { realpathSync } from "node:fs";
+import { resolve, isAbsolute, sep, dirname } from "node:path";
 
 // Frozen so a runtime mutation of this array cannot quietly expand the whitelist.
 // This whitelist is the entire feature's read-only safety boundary.
 export const READ_ONLY_TOOLS = Object.freeze(["Read", "Glob", "Grep"]);
+
+// Resolve symlinks for the deepest part of the path that exists, so a link
+// inside the vault cannot point Read at the rest of the disk.
+function realish(p) {
+  let cur = p;
+  const tail = [];
+  for (;;) {
+    try { return [realpathSync(cur), ...tail.reverse()].join(sep); } catch {}
+    const up = dirname(cur);
+    if (up === cur) return p;
+    tail.push(cur.slice(up.length).replace(/^[\\/]+/, ""));
+    cur = up;
+  }
+}
+
+/**
+ * Deny any Read/Glob/Grep that reaches outside the vault (absolute paths,
+ * "..", or symlinks). The chat is read-only; this keeps it vault-only too.
+ */
+export function vaultDecision(toolName, input, vaultPath) {
+  const root = realish(resolve(vaultPath));
+  const inside = (p) => {
+    if (typeof p !== "string" || !p) return true;
+    if (p.includes("..")) return false;
+    const full = realish(isAbsolute(p) ? resolve(p) : resolve(vaultPath, p));
+    return full === root || full.startsWith(root + sep);
+  };
+  const candidates = toolName === "Read" ? [input?.file_path]
+    : toolName === "Glob" ? [input?.path, input?.pattern]
+    : toolName === "Grep" ? [input?.path, input?.glob]
+    : [];
+  for (const p of candidates) {
+    if (!inside(p)) return { deny: true, message: "Only files inside this shop's vault can be read here." };
+  }
+  return { deny: false };
+}
 
 export function buildQueryOptions({ vaultPath, systemPrompt, claudeSessionId }) {
   const opts = {
@@ -21,6 +59,26 @@ export function buildQueryOptions({ vaultPath, systemPrompt, claudeSessionId }) 
     settingSources: [],
     permissionMode: "default",
     maxTurns: 20,
+    // Read-only tools are auto-approved, so this hook is the enforcement point
+    // that runs for every call: nothing outside the vault.
+    hooks: {
+      PreToolUse: [
+        {
+          hooks: [
+            async (hookInput) => {
+              if (hookInput.hook_event_name !== "PreToolUse") return {};
+              const d = vaultDecision(hookInput.tool_name, hookInput.tool_input, vaultPath);
+              if (!d.deny) return {};
+              return {
+                decision: "block",
+                reason: d.message,
+                hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: d.message },
+              };
+            },
+          ],
+        },
+      ],
+    },
   };
   if (claudeSessionId) opts.resume = claudeSessionId;
   return opts;
