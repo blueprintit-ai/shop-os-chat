@@ -66,6 +66,21 @@ function serveStatic(req, res, path) {
   res.end(readFileSync(path));
 }
 
+function loopbackHost(req) {
+  const raw = req.headers.host;
+  if (!raw) return false;
+  let u;
+  try { u = new URL(`http://${raw}`); } catch { return false; }
+  const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  const localPort = req.socket?.localPort;
+  if (localPort && String(u.port || 80) !== String(localPort)) return false;
+  return host === "localhost" || host === "127.0.0.1" || host === "::1";
+}
+
+function sameHost(origin, host) {
+  try { return new URL(origin).host === host; } catch { return false; }
+}
+
 export function createServer({ vaultPath, runTurn = defaultRunTurn }) {
   const sessions = new SessionStore();
   const gcTimer = setInterval(() => sessions.gc(), 10 * 60 * 1000);
@@ -74,6 +89,15 @@ export function createServer({ vaultPath, runTurn = defaultRunTurn }) {
   const server = createHttpServer(async (req, res) => {
     try {
       const url = new URL(req.url, "http://localhost");
+      // DNS rebinding: a hostile page can point its own domain at 127.0.0.1,
+      // so only answer to loopback names on our own port.
+      if (!loopbackHost(req)) {
+        return send(res, 421, { "content-type": "text/plain" }, "Unknown host. Open Blueprint OS Chat at http://localhost.");
+      }
+      // Cross-site requests: a browser always sends Origin on POST.
+      if (req.method !== "GET" && req.headers.origin && !sameHost(req.headers.origin, req.headers.host)) {
+        return sendJson(res, 403, { error: "cross-origin" });
+      }
 
       if (req.method === "GET" && url.pathname === "/") {
         const indexPath = join(PUBLIC_DIR, "index.html");
